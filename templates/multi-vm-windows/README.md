@@ -50,18 +50,20 @@ cp parameters.example.json parameters.json
 Set a strong password in parameters.json.
 
 ### 3) Run what-if
-```bash```
+```bash
 az deployment group what-if \
   -g <resource-group> \
   -f main.bicep \
-  -p @parameters.json
+  -p main.parameters.json
+```
 
   ### 4) Deploy
-```bash```
+```bash
 az deployment group create \
   -g <resource-group> \
   -f main.bicep \
-  -p @parameters.json
+  -p main.parameters.json
+```
 
 ## Security notes
 

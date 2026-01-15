@@ -1,0 +1,42 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminUsername": {
+      "value": "azureadmin"
+    },
+    "adminPassword": {
+      "value": "__REPLACE_ME__"
+    },
+    "vmCount": {
+      "value": 1
+    },
+    "dnsLabelPrefix": {
+      "value": "myvm"
+    },
+    "publicIpName": {
+      "value": "myPublicIP"
+    },
+    "publicIPAllocationMethod": {
+      "value": "Static"
+    },
+    "publicIpSku": {
+      "value": "Standard"
+    },
+    "OSVersion": {
+      "value": "2022-datacenter-azure-edition"
+    },
+    "vmSize": {
+      "value": "Standard_B1s"
+    },
+    "location": {
+      "value": "westeurope"
+    },
+    "vmName": {
+      "value": "myvm"
+    },
+    "securityType": {
+      "value": "TrustedLaunch"
+    }
+  }
+}
