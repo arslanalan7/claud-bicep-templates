@@ -248,3 +248,47 @@ Feedback, suggestions, and improvements are very welcome.
   - Real-world production feedback
 
 The goal is to evolve this foundation through shared experience.
+
+---
+
+# Azure Monitor DCR - Linux Syslog Forwarding (Ubuntu 24.04)
+
+This repository contains Bicep templates for defining Data Collection Rules (DCR) in Azure Monitor.  
+When deploying AMA (Azure Monitor Agent) on Linux VMs, by default only `auth` facility logs are forwarded to Log Analytics.  
+On modern distributions such as **Ubuntu 24.04**, journald → rsyslog forwarding is not enabled by default, which means other facilities (`kern`, `daemon`, `user`, `syslog`) are not captured.
+
+## 📌 Solution: Enable journald → rsyslog Forwarding
+
+### 1. Add imjournal module to rsyslog configuration
+Run the following commands on the VM to append the required lines to `/etc/rsyslog.conf`:
+
+```bash
+echo 'module(load="imjournal" PollingInterval="10")' | sudo tee -a /etc/rsyslog.conf
+echo 'input(type="imjournal" StateFile="/var/lib/rsyslog/imjournal.state")' | sudo tee -a /etc/rsyslog.conf
+```
+
+### 2. Restart rsyslog service
+
+```bash
+sudo systemctl restart rsyslog
+```
+
+### 3. Validate configuration
+
+```bash
+rsyslogd -N1
+```
+
+This command tests the rsyslog configuration. If the imjournal module is successfully loaded, no errors will be reported.
+
+### 4. Generate test logs
+
+```bash
+logger -p user.info "Test message from user facility"
+logger -p kern.warning "Test message from kernel facility"
+```
+
+### 5. Verify in Log Analytics
+
+Navigate to Log Analytics Workspace → Logs → Syslog table in the Azure Portal.
+You should now see entries for facility=user and facility=kern, in addition to auth.

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": { "value": "westeurope" },
+
+    "dcrWindowsBaselineId": { "value": "/subscriptions/.../resourceGroups/rg-az400-unit4-monitoring/providers/Microsoft.Insights/dataCollectionRules/dcr-prod-windows-baseline" },
+    "dcrWindowsVerboseId":  { "value": "/subscriptions/.../resourceGroups/rg-az400-unit4-monitoring/providers/Microsoft.Insights/dataCollectionRules/dcr-prod-windows-verbose" },
+    "dcrLinuxBaselineId":   { "value": "/subscriptions/.../resourceGroups/rg-az400-unit4-monitoring/providers/Microsoft.Insights/dataCollectionRules/dcr-prod-linux-baseline" },
+    "dcrLinuxVerboseId":    { "value": "/subscriptions/.../resourceGroups/rg-az400-unit4-monitoring/providers/Microsoft.Insights/dataCollectionRules/dcr-prod-linux-verbose" },
+
+    "defaultMode": { "value": "baseline" },
+    "allowVerbose": { "value": true },
+
+    "targets": {
+      "value": [
+        { "rgName": "rg-app-prod", "vmName": "vm-app-01", "osType": "windows", "mode": "baseline" },
+        { "rgName": "rg-app-prod", "vmName": "vm-app-02", "osType": "windows", "mode": "verbose" },
+        { "rgName": "rg-api-prod", "vmName": "vm-api-01", "osType": "linux", "mode": "baseline" }
+      ]
+    }
+  }
+}

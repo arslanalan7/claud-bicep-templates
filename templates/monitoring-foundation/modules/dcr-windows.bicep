@@ -14,7 +14,34 @@ param workspaceResourceId string
   'baseline'
   'verbose'
 ])
-param mode string
+param mode string = 'baseline'
+
+var perfCounters = mode == 'verbose'
+  ? [
+      '\\Processor(_Total)\\% Processor Time'
+      '\\Process(*)\\% Processor Time'
+      '\\Memory\\Available MBytes'
+      '\\Memory\\% Committed Bytes In Use'
+      '\\Memory\\Page Faults/sec'
+      '\\LogicalDisk(*)\\Free Megabytes'
+      '\\LogicalDisk(*)\\% Free Space'
+      '\\LogicalDisk(*)\\Avg. Disk sec/Read'
+      '\\LogicalDisk(*)\\Disk Reads/sec'
+      '\\LogicalDisk(*)\\Avg. Disk sec/Write'
+      '\\LogicalDisk(*)\\Disk Writes/sec'
+      '\\Network Adapter(*)\\Bytes Sent/sec'
+      '\\Network Adapter(*)\\Bytes Received/sec'
+      '\\System\\Processor Queue Length'
+    ]
+  : [
+      '\\Processor(_Total)\\% Processor Time'
+      '\\Memory\\Available MBytes'
+      '\\Memory\\% Committed Bytes In Use'
+      '\\LogicalDisk(*)\\Free Megabytes'
+      '\\LogicalDisk(*)\\% Free Space'
+      '\\Network Interface(*)\\Bytes Total/sec'
+      '\\System\\Processor Queue Length'
+    ]
 
 @description('Performance counter sampling frequency in seconds.')
 @minValue(10)
@@ -53,12 +80,7 @@ resource dcr 'Microsoft.Insights/dataCollectionRules@2022-06-01' = {
           ]
           samplingFrequencyInSeconds: perfSamplingSeconds
           // Keep minimal: KPI + first-pass RCA.
-          counterSpecifiers: [
-            '\\Processor(_Total)\\% Processor Time'
-            '\\Memory\\Available MBytes'
-            '\\LogicalDisk(*)\\Free Megabytes'
-            '\\LogicalDisk(*)\\% Free Space'
-          ]
+          counterSpecifiers: perfCounters
         }
       ]
     }
@@ -75,6 +97,7 @@ resource dcr 'Microsoft.Insights/dataCollectionRules@2022-06-01' = {
         streams: [
           'Microsoft-Event'
           'Microsoft-Perf'
+          'Microsoft-Heartbeat'
         ]
         destinations: [
           'la'

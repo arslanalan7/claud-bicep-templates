@@ -58,8 +58,12 @@ param publicIpSku string = 'Standard'
   '2022-datacenter-core-smalldisk-g2'
   '2022-datacenter-g2'
   '2022-datacenter-smalldisk-g2'
+  '2025-datacenter-azure-edition'
+  '2025-datacenter-azure-edition-smalldisk'
+  '2025-datacenter-azure-edition-core'
+  '2025-datacenter-azure-edition-core-smalldisk'
 ])
-param OSVersion string = '2022-datacenter-azure-edition'
+param OSVersion string = '2025-datacenter-azure-edition'
 
 @description('The size of the VM.')
 param vmSize string = 'Standard_D2s_v3'
@@ -204,6 +208,9 @@ resource nics 'Microsoft.Network/networkInterfaces@2022-05-01' = [for i in range
 resource vms 'Microsoft.Compute/virtualMachines@2022-03-01' = [for i in range(0, vmCount): {
   name: '${vmName}-${i + 1}'
   location: location
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     hardwareProfile: {
       vmSize: vmSize
@@ -231,6 +238,9 @@ resource vms 'Microsoft.Compute/virtualMachines@2022-03-01' = [for i in range(0,
           diskSizeGB: 64
           lun: 0
           createOption: 'Empty'
+          managedDisk: {
+            storageAccountType: 'Standard_LRS'
+          }
         }
       ]
     }

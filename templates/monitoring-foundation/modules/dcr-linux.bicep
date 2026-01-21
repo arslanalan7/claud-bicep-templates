@@ -14,7 +14,56 @@ param workspaceResourceId string
   'baseline'
   'verbose'
 ])
-param mode string
+param mode string = 'baseline'
+
+var perfCountersLinux = mode == 'verbose'
+  ? [
+      'Processor(*)\\% Processor Time'
+      'Processor(*)\\% IO Wait Time'
+      'Memory(*)\\Available MBytes Memory'
+      'Memory(*)\\% Available Memory'
+      'Memory(*)\\Pages/sec'
+      'Memory(*)\\Page Reads/sec'
+      'Memory(*)\\Page Writes/sec'
+      'Memory(*)\\Available MBytes Swap'
+      'Memory(*)\\% Available Swap Space'
+      'Process(*)\\Pct User Time'
+      'Process(*)\\Pct Privileged Time'
+      'Logical Disk(*)\\% Free Space'
+      'Logical Disk(*)\\Free Megabytes'
+      'Logical Disk(*)\\Disk Reads/sec'
+      'Logical Disk(*)\\Disk Writes/sec'
+      'Network(*)\\Total Bytes Transmitted'
+      'Network(*)\\Total Bytes Received'
+      'System(*)\\Load1'
+      'System(*)\\Load5'
+      'System(*)\\Load15'
+      'System(*)\\Users'
+    ]
+  : [
+      'Processor(*)\\% Processor Time'
+      'Memory(*)\\Available MBytes Memory'
+      'Memory(*)\\Available MBytes Swap'
+      'Logical Disk(*)\\% Free Space'
+      'Network(*)\\Total Bytes'
+      'System(*)\\Load5'
+    ]
+
+var facilityNamesLinux = mode == 'verbose'
+  ? [
+      'auth'
+      'authpriv'
+      'kern'
+      'daemon'
+      'syslog'
+      'user'
+    ]
+  : [
+      'auth'
+      'authpriv'
+      'syslog'
+      'user'
+    ]
 
 @description('Performance counter sampling frequency in seconds.')
 @minValue(10)
@@ -53,14 +102,7 @@ resource dcr 'Microsoft.Insights/dataCollectionRules@2022-06-01' = {
             'Microsoft-Syslog'
           ]
           // Minimal facilities with strong RCA value.
-          facilityNames: [
-            'auth'
-            'authpriv'
-            'kern'
-            'daemon'
-            'syslog'
-            'user'
-          ]
+          facilityNames: facilityNamesLinux
           logLevels: syslogLevels
         }
       ]
@@ -73,12 +115,7 @@ resource dcr 'Microsoft.Insights/dataCollectionRules@2022-06-01' = {
           samplingFrequencyInSeconds: perfSamplingSeconds
           // NOTE: Linux perf counters vary by distro/config.
           // Keep minimal; refine after validating ingestion.
-          counterSpecifiers: [
-            '\\Processor(_Total)\\% Processor Time'
-            '\\Memory\\Available MBytes'
-            '\\LogicalDisk(*)\\Free Megabytes'
-            '\\LogicalDisk(*)\\% Free Space'
-          ]
+          counterSpecifiers: perfCountersLinux
         }
       ]
     }
@@ -95,6 +132,7 @@ resource dcr 'Microsoft.Insights/dataCollectionRules@2022-06-01' = {
         streams: [
           'Microsoft-Syslog'
           'Microsoft-Perf'
+          'Microsoft-Heartbeat'
         ]
         destinations: [
           'la'
